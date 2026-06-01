@@ -5,6 +5,5 @@ __pycache__/
 node_modules/
 .next/
 *.db
-
 backend/recommender/*.pkl
 backend/recommender/*.pickle
