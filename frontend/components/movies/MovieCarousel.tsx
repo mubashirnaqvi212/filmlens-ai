@@ -48,8 +48,7 @@ export default function MovieCarousel({ title, movies, onMovieClick }: MovieCaro
 
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{paddingLeft: '48px', paddingRight: '48px'}}
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{paddingLeft: '48px', paddingRight: '48px', scrollbarWidth: 'none', msOverflowStyle: 'none'}}
       >
         {movies.map((movie) => (
           <div key={movie.movie_id} className="flex-shrink-0 w-40">
