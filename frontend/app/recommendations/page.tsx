@@ -1,14 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, User, Film, Sliders } from 'lucide-react'
+import { Sparkles, User, Film, Sliders, ChevronRight } from 'lucide-react'
 import { getHybridRecommendations, getCollaborativeRecommendations } from '@/lib/api'
-import { RecommendationItem } from '@/types'
+import { RecommendationItem, Movie } from '@/types'
 import Navbar from '@/components/ui/Navbar'
 import SearchBar from '@/components/movies/SearchBar'
 import RecommendationCard from '@/components/recommendations/RecommendationCard'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { Movie } from '@/types'
 
 export default function RecommendationsPage() {
   const [userId, setUserId] = useState(1)
@@ -18,6 +17,7 @@ export default function RecommendationsPage() {
   const [loading, setLoading] = useState(false)
   const [mode, setMode] = useState<'hybrid' | 'collaborative'>('hybrid')
   const [seedTitle, setSeedTitle] = useState('')
+  const [hasResults, setHasResults] = useState(false)
 
   const handleGetRecommendations = async () => {
     setLoading(true)
@@ -31,6 +31,7 @@ export default function RecommendationsPage() {
         setRecommendations(data.recommendations)
         setSeedTitle('')
       }
+      setHasResults(true)
     } catch (e) {
       console.error(e)
     } finally {
@@ -39,168 +40,283 @@ export default function RecommendationsPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#141414' }}>
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 pb-16" style={{paddingTop: '100px'}}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-10"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-4 bg-red-950 text-red-400 border border-red-900">
-            <Sparkles className="w-4 h-4" />
-            <span>AI Recommendation Engine</span>
+      <div style={{ paddingTop: '100px', paddingBottom: '64px' }}>
+
+        {/* Hero Header */}
+        <div style={{ textAlign: 'center', marginBottom: '48px', padding: '0 24px' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '8px 16px', borderRadius: '9999px',
+            backgroundColor: '#450a0a', color: '#f87171',
+            border: '1px solid #7f1d1d', fontSize: '13px',
+            fontWeight: '500', marginBottom: '16px'
+          }}>
+            <Sparkles style={{ width: '14px', height: '14px' }} />
+            AI Recommendation Engine
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Get Recommendations</h1>
-          <p className="text-zinc-400">Powered by SVD collaborative filtering + TF-IDF content analysis</p>
-        </motion.div>
-
-        {/* Controls */}
-        <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
-          {/* Mode toggle */}
-          <div className="flex gap-3 mb-6">
-            <button
-              onClick={() => setMode('hybrid')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all ${
-                mode === 'hybrid'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-zinc-400 hover:text-white'
-              }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              Hybrid (Recommended)
-            </button>
-            <button
-              onClick={() => setMode('collaborative')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all ${
-                mode === 'collaborative'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-zinc-400 hover:text-white'
-              }`}
-            >
-              <User className="w-4 h-4" />
-              Collaborative Only
-            </button>
-          </div>
-
-          {/* User ID */}
-          <div className="mb-4">
-            <label className="flex items-center gap-2 text-sm text-zinc-400 mb-2">
-              <User className="w-4 h-4" />
-              User ID (1–610)
-            </label>
-            <input
-              type="number"
-              min={1}
-              max={610}
-              value={userId}
-              onChange={e => setUserId(Number(e.target.value))}
-              className="w-full px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-red-600"
-              style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}
-            />
-          </div>
-
-          {/* Seed movie (hybrid only) */}
-          {mode === 'hybrid' && (
-            <div className="mb-4">
-              <label className="flex items-center gap-2 text-sm text-zinc-400 mb-2">
-                <Film className="w-4 h-4" />
-                Seed Movie
-              </label>
-              {seedMovie ? (
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl"
-                  style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}>
-                  <div>
-                    <p className="text-white text-sm font-medium">{seedMovie.title}</p>
-                    <p className="text-zinc-400 text-xs">{seedMovie.year}</p>
-                  </div>
-                  <button onClick={() => setSeedMovie(null)} className="text-zinc-400 hover:text-white text-xs">
-                    Change
-                  </button>
-                </div>
-              ) : (
-                <SearchBar onSelectMovie={setSeedMovie} />
-              )}
-            </div>
-          )}
-
-          {/* Alpha slider (hybrid only) */}
-          {mode === 'hybrid' && (
-            <div className="mb-6">
-              <label className="flex items-center justify-between text-sm text-zinc-400 mb-2">
-                <div className="flex items-center gap-2">
-                  <Sliders className="w-4 h-4" />
-                  Content vs Collaborative weight
-                </div>
-                <span className="text-white font-medium">α = {alpha.toFixed(1)}</span>
-              </label>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.1}
-                value={alpha}
-                onChange={e => setAlpha(Number(e.target.value))}
-                className="w-full accent-red-600"
-              />
-              <div className="flex justify-between text-xs text-zinc-500 mt-1">
-                <span>Pure Collaborative</span>
-                <span>Balanced</span>
-                <span>Pure Content</span>
-              </div>
-            </div>
-          )}
-
-          {/* Submit */}
-          <button
-            onClick={handleGetRecommendations}
-            disabled={loading || (mode === 'hybrid' && !seedMovie)}
-            className="w-full py-3 rounded-xl font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            style={{ backgroundColor: 'var(--accent)' }}
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                Get Recommendations
-              </>
-            )}
-          </button>
+          <h1 style={{ fontSize: '42px', fontWeight: 'bold', color: 'white', marginBottom: '8px' }}>
+            Get Recommendations
+          </h1>
+          <p style={{ color: '#71717a', fontSize: '16px' }}>
+            Powered by SVD collaborative filtering + TF-IDF content analysis
+          </p>
         </div>
 
-        {/* Results */}
-        {recommendations.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">
-                {seedTitle ? `Because you liked: ${seedTitle}` : `Recommended for User ${userId}`}
-              </h2>
-              <span className="text-zinc-400 text-sm">{recommendations.length} results</span>
-            </div>
+        {/* Main Layout */}
+        <div style={{
+          maxWidth: '1100px', margin: '0 auto',
+          padding: '0 24px',
+          display: 'grid',
+          gridTemplateColumns: hasResults ? '380px 1fr' : '1fr',
+          gap: '32px',
+          alignItems: 'start'
+        }}>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recommendations.map((rec, i) => (
-                <RecommendationCard
-                  key={rec.movie_id}
-                  item={rec}
-                  index={i}
-                  userId={userId}
-                  recommendationType={mode === 'hybrid' ? 'hybrid' : 'collaborative'}
-                />
+          {/* Controls Panel */}
+          <div style={{
+            backgroundColor: '#1c1c1c',
+            border: '1px solid #2a2a2a',
+            borderRadius: '20px',
+            padding: '28px',
+            ...(hasResults ? {} : { maxWidth: '480px', margin: '0 auto', width: '100%' })
+          }}>
+
+            {/* Mode Toggle */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              gap: '8px', marginBottom: '28px',
+              backgroundColor: '#141414',
+              padding: '4px', borderRadius: '14px'
+            }}>
+              {[
+                { key: 'hybrid', label: 'Hybrid', icon: Sparkles },
+                { key: 'collaborative', label: 'Collaborative', icon: User }
+              ].map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setMode(key as 'hybrid' | 'collaborative')}
+                  style={{
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', gap: '6px',
+                    padding: '10px', borderRadius: '10px',
+                    fontSize: '13px', fontWeight: '600',
+                    border: 'none', cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    backgroundColor: mode === key ? '#e50914' : 'transparent',
+                    color: mode === key ? 'white' : '#71717a',
+                  }}
+                >
+                  <Icon style={{ width: '14px', height: '14px' }} />
+                  {label}
+                </button>
               ))}
             </div>
-          </motion.div>
-        )}
+
+            {/* User ID */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                fontSize: '13px', color: '#a1a1aa',
+                marginBottom: '8px', fontWeight: '500'
+              }}>
+                <User style={{ width: '14px', height: '14px' }} />
+                User ID (1–610)
+              </label>
+              <input
+                type="number"
+                min={1} max={610}
+                value={userId}
+                onChange={e => setUserId(Number(e.target.value))}
+                style={{
+                  width: '100%', padding: '12px 16px',
+                  borderRadius: '12px', color: 'white',
+                  backgroundColor: '#141414',
+                  border: '1px solid #2a2a2a',
+                  fontSize: '14px', outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            {/* Seed Movie */}
+            {mode === 'hybrid' && (
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  fontSize: '13px', color: '#a1a1aa',
+                  marginBottom: '8px', fontWeight: '500'
+                }}>
+                  <Film style={{ width: '14px', height: '14px' }} />
+                  Seed Movie
+                </label>
+                {seedMovie ? (
+                  <div style={{
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 16px', borderRadius: '12px',
+                    backgroundColor: '#141414',
+                    border: '1px solid #2a2a2a'
+                  }}>
+                    <div>
+                      <p style={{ color: 'white', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+                        {seedMovie.title}
+                      </p>
+                      <p style={{ color: '#71717a', fontSize: '12px', margin: '2px 0 0 0' }}>
+                        {seedMovie.year}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSeedMovie(null)}
+                      style={{
+                        color: '#71717a', background: 'none',
+                        border: 'none', cursor: 'pointer',
+                        fontSize: '12px'
+                      }}
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <SearchBar onSelectMovie={setSeedMovie} />
+                )}
+              </div>
+            )}
+
+            {/* Alpha Slider */}
+            {mode === 'hybrid' && (
+              <div style={{ marginBottom: '28px' }}>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  alignItems: 'center', marginBottom: '10px'
+                }}>
+                  <label style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    fontSize: '13px', color: '#a1a1aa', fontWeight: '500'
+                  }}>
+                    <Sliders style={{ width: '14px', height: '14px' }} />
+                    Blend Weight
+                  </label>
+                  <span style={{
+                    fontSize: '13px', fontWeight: '600',
+                    color: '#e50914',
+                    backgroundColor: '#450a0a',
+                    padding: '2px 10px', borderRadius: '9999px'
+                  }}>
+                    α = {alpha.toFixed(1)}
+                  </span>
+                </div>
+                <input
+                  type="range" min={0} max={1} step={0.1}
+                  value={alpha}
+                  onChange={e => setAlpha(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#e50914' }}
+                />
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  fontSize: '11px', color: '#52525b', marginTop: '6px'
+                }}>
+                  <span>← Collaborative</span>
+                  <span>Balanced</span>
+                  <span>Content →</span>
+                </div>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              onClick={handleGetRecommendations}
+              disabled={loading || (mode === 'hybrid' && !seedMovie)}
+              style={{
+                width: '100%', padding: '14px',
+                borderRadius: '14px', fontWeight: '600',
+                fontSize: '15px', color: 'white',
+                backgroundColor: (loading || (mode === 'hybrid' && !seedMovie))
+                  ? '#7f1d1d' : '#e50914',
+                border: 'none',
+                cursor: (loading || (mode === 'hybrid' && !seedMovie))
+                  ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'center', gap: '8px',
+                transition: 'all 0.2s'
+              }}
+            >
+              {loading ? (
+                <>
+                  <div style={{
+                    width: '16px', height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTop: '2px solid white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite'
+                  }} />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles style={{ width: '16px', height: '16px' }} />
+                  Get Recommendations
+                  <ChevronRight style={{ width: '16px', height: '16px' }} />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Results */}
+          {hasResults && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'space-between', marginBottom: '20px'
+              }}>
+                <div>
+                  <h2 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>
+                    {seedTitle ? `Because you liked "${seedTitle}"` : `For User ${userId}`}
+                  </h2>
+                  <p style={{ color: '#71717a', fontSize: '13px', margin: '4px 0 0 0' }}>
+                    {recommendations.length} recommendations
+                  </p>
+                </div>
+                <div style={{
+                  padding: '6px 14px', borderRadius: '9999px',
+                  backgroundColor: '#1c1c1c', border: '1px solid #2a2a2a',
+                  fontSize: '12px', color: '#a1a1aa'
+                }}>
+                  {mode === 'hybrid' ? `Hybrid · α=${alpha}` : 'Collaborative SVD'}
+                </div>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: '16px'
+              }}>
+                {recommendations.map((rec, i) => (
+                  <RecommendationCard
+                    key={rec.movie_id}
+                    item={rec}
+                    index={i}
+                    userId={userId}
+                    recommendationType={mode === 'hybrid' ? 'hybrid' : 'collaborative'}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
