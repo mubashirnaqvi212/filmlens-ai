@@ -7,3 +7,4 @@ node_modules/
 *.db
 backend/recommender/*.pkl
 backend/recommender/*.pickle
+frontend/.env.local
