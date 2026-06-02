@@ -58,7 +58,7 @@ export default function MovieDetailPage() {
     <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 pt-24 pb-16">
+      <div className="max-w-6xl mx-auto px-4 pb-16" style={{paddingTop: '100px'}}>
         {/* Back button */}
         <button
           onClick={() => router.back()}

@@ -37,33 +37,40 @@ export default function MoviesPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="min-h-screen bg-[#141414]">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 pt-24 pb-16">
+      <div style={{paddingTop: '100px', paddingLeft: '48px', paddingRight: '48px', paddingBottom: '64px'}}>
+
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Film className="w-6 h-6 text-red-500" />
-          <h1 className="text-3xl font-bold text-white">Movies</h1>
-          <span className="text-zinc-400 text-sm">({total.toLocaleString()} total)</span>
+        <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px'}}>
+          <Film style={{width: '24px', height: '24px', color: '#e50914'}} />
+          <h1 style={{fontSize: '30px', fontWeight: 'bold', color: 'white'}}>Movies</h1>
+          <span style={{color: '#6b7280', fontSize: '14px'}}>({total.toLocaleString()} total)</span>
         </div>
 
         {/* Search */}
-        <div className="mb-6">
+        <div style={{maxWidth: '480px', marginBottom: '20px'}}>
           <SearchBar onSelectMovie={m => router.push(`/movies/${m.movie_id}`)} />
         </div>
 
         {/* Genre filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px'}}>
           {GENRES.map(g => (
             <button
               key={g}
               onClick={() => handleGenreChange(g)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                genre === g
-                  ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700'
-              }`}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '9999px',
+                fontSize: '14px',
+                fontWeight: '500',
+                border: 'none',
+                cursor: 'pointer',
+                backgroundColor: genre === g ? '#e50914' : '#27272a',
+                color: genre === g ? 'white' : '#a1a1aa',
+                transition: 'all 0.2s'
+              }}
             >
               {g}
             </button>
@@ -72,12 +79,16 @@ export default function MoviesPage() {
 
         {/* Grid */}
         {loading ? (
-          <div className="flex justify-center py-20">
+          <div style={{display: 'flex', justifyContent: 'center', paddingTop: '80px', paddingBottom: '80px'}}>
             <LoadingSpinner size="lg" />
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+              gap: '16px'
+            }}>
               {movies.map((movie, i) => (
                 <motion.div
                   key={movie.movie_id}
@@ -94,19 +105,37 @@ export default function MoviesPage() {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-center gap-4 mt-10">
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '40px'}}>
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-6 py-2 rounded-xl text-sm font-medium bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-40 transition-all"
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  backgroundColor: '#27272a',
+                  color: page === 1 ? '#52525b' : '#a1a1aa',
+                  border: 'none',
+                  cursor: page === 1 ? 'not-allowed' : 'pointer'
+                }}
               >
                 Previous
               </button>
-              <span className="text-zinc-400 text-sm">Page {page}</span>
+              <span style={{color: '#6b7280', fontSize: '14px'}}>Page {page}</span>
               <button
                 onClick={() => setPage(p => p + 1)}
                 disabled={movies.length < 24}
-                className="px-6 py-2 rounded-xl text-sm font-medium bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-40 transition-all"
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  backgroundColor: '#27272a',
+                  color: movies.length < 24 ? '#52525b' : '#a1a1aa',
+                  border: 'none',
+                  cursor: movies.length < 24 ? 'not-allowed' : 'pointer'
+                }}
               >
                 Next
               </button>
