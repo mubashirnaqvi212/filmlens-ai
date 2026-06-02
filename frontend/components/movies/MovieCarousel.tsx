@@ -28,7 +28,7 @@ export default function MovieCarousel({ title, movies, onMovieClick }: MovieCaro
 
   return (
     <div className="mb-10">
-      <div className="flex items-center justify-between mb-4 px-4">
+      <div className="flex items-center justify-between" style={{marginBottom: '16px', paddingLeft: '48px', paddingRight: '48px'}}>
         <h2 className="text-xl font-bold text-white">{title}</h2>
         <div className="flex gap-2">
           <button
@@ -48,7 +48,7 @@ export default function MovieCarousel({ title, movies, onMovieClick }: MovieCaro
 
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-4 px-4 scrollbar-hide"
+        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{paddingLeft: '48px', paddingRight: '48px'}}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {movies.map((movie) => (

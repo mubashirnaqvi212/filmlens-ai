@@ -66,7 +66,7 @@ export default function MovieCard({ movie, onClick, showRating = true }: MovieCa
       </div>
 
       {/* Info */}
-      <div className="p-3">
+      <div className="p-3 pb-4">
         <h3 className="font-semibold text-white text-sm leading-tight line-clamp-2 mb-1">
           {movie.title}
         </h3>
