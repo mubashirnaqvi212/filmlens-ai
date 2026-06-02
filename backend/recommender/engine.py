@@ -177,3 +177,4 @@ class RecommendationEngine:
             'baseline_rmse': 1.4243,
             'improvement_pct': 38.7
         }
+engine = RecommendationEngine()
