@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Footer from '@/components/ui/Footer'
 
 export const metadata: Metadata = {
   title: 'FilmLens AI — Smart Movie Recommendations',
@@ -13,8 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
+      <body style={{ backgroundColor: '#141414', color: 'white', margin: 0 }}>
         {children}
+        <Footer />
       </body>
     </html>
   )

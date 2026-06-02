@@ -15,29 +15,46 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b"
-      style={{ backgroundColor: 'rgba(20,20,20,0.95)', borderColor: 'var(--border)' }}>
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+      backgroundColor: 'rgba(20,20,20,0.95)',
+      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid #2a2a2a'
+    }}>
+      <div style={{
+        maxWidth: '1280px', margin: '0 auto',
+        padding: '0 48px', height: '64px',
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <div className="p-1.5 rounded-lg bg-red-600">
-            <Film className="w-4 h-4 text-white" />
+        <Link href="/" style={{
+          display: 'flex', alignItems: 'center',
+          gap: '8px', textDecoration: 'none',
+          fontWeight: 'bold', fontSize: '18px'
+        }}>
+          <div style={{
+            padding: '6px', borderRadius: '8px',
+            backgroundColor: '#e50914'
+          }}>
+            <Film style={{ width: '16px', height: '16px', color: 'white' }} />
           </div>
-          <span className="text-white">FilmLens</span>
-          <span className="text-red-500">AI</span>
+          <span style={{ color: 'white' }}>FilmLens</span>
+          <span style={{ color: '#e50914' }}>AI</span>
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-6">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           {links.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors ${
-                pathname === link.href
-                  ? 'text-red-500'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
+              style={{
+                fontSize: '14px', fontWeight: '500',
+                textDecoration: 'none',
+                color: pathname === link.href ? '#e50914' : '#a1a1aa',
+                transition: 'color 0.2s'
+              }}
             >
               {link.label}
             </Link>
@@ -45,38 +62,17 @@ export default function Navbar() {
         </div>
 
         {/* AI Badge */}
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-red-950 text-red-400 border border-red-900">
-          <Sparkles className="w-3 h-3" />
-          <span>SVD + TF-IDF</span>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '6px 14px', borderRadius: '9999px',
+          fontSize: '12px', fontWeight: '500',
+          backgroundColor: '#450a0a', color: '#f87171',
+          border: '1px solid #7f1d1d'
+        }}>
+          <Sparkles style={{ width: '12px', height: '12px' }} />
+          SVD + TF-IDF
         </div>
-
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden text-zinc-400 hover:text-white"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
       </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t px-4 py-4 flex flex-col gap-3"
-          style={{ borderColor: 'var(--border)', backgroundColor: 'var(--background)' }}>
-          {links.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className={`text-sm font-medium py-2 transition-colors ${
-                pathname === link.href ? 'text-red-500' : 'text-zinc-400'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-      )}
     </nav>
   )
 }
