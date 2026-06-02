@@ -1,163 +1,258 @@
-# FilmLens AI 🎬
+# FilmLens AI
 
-> Full-stack AI movie recommendation system — SVD collaborative filtering + TF-IDF content analysis, served via FastAPI, visualized in a Netflix-style Next.js UI.
+A full-stack movie recommendation system built with FastAPI and Next.js, using SVD collaborative filtering and TF-IDF content-based filtering. Trained on the MovieLens dataset (100K ratings), served via a REST API, and deployed on Railway + Vercel.
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?style=flat-square&logo=fastapi)
-![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5-orange?style=flat-square&logo=scikitlearn)
-![Deployed](https://img.shields.io/badge/Deployed-Railway%20%2B%20Vercel-brightgreen?style=flat-square)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square&logo=python)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://typescriptlang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-## 🔗 Live Demo
-
-| | Link |
-|---|---|
-| **Frontend** | [filmlens-ai-blue.vercel.app](https://filmlens-ai-blue.vercel.app) |
-| **API Docs** | [filmlens-api-production.up.railway.app/docs](https://filmlens-api-production.up.railway.app/docs) |
+**Live demo:** [filmlens-ai-blue.vercel.app](https://filmlens-ai-blue.vercel.app) — **API docs:** [filmlens-api-production.up.railway.app/docs](https://filmlens-api-production.up.railway.app/docs)
 
 ---
 
-## 🧠 What Makes This Interesting
+## Table of Contents
 
-Most recommendation tutorials stop at a Jupyter notebook. This project goes end-to-end:
-
-- **Real ML pipeline** — EDA → feature engineering → model training → evaluation → serving
-- **Three recommendation strategies** with a live alpha-blending slider
-- **Every recommendation is explained** — users see *why* a movie was recommended
-- **Thumbs up/down feedback loop** — ratings sent back to the FastAPI backend
-- **Deployed and publicly accessible** — not just a local demo
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [ML Pipeline](#ml-pipeline)
+- [API Reference](#api-reference)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Deployment](#deployment)
+- [Design Decisions](#design-decisions)
 
 ---
 
-## 📊 ML Performance
+## Overview
 
-| Metric | Score | vs Baseline |
+FilmLens AI implements three recommendation strategies:
+
+| Strategy | Method | Use Case |
 |---|---|---|
-| SVD RMSE | **0.8727** | **38.7% better** |
-| SVD MAE | 0.6713 | 40.9% better |
-| Precision@10 | **74.5%** | — |
-| Recall@10 | 50.9% | — |
+| Content-Based | TF-IDF on genres + cosine similarity | Cold-start users |
+| Collaborative | SVD matrix factorization | Users with rating history |
+| Hybrid | Weighted blend with adjustable alpha | Best overall accuracy |
 
-Dataset: [MovieLens ml-latest-small](https://grouplens.org/datasets/movielens/) — 9,742 movies, 100,836 ratings, 610 users, 98.3% matrix sparsity.
-
----
-
-## 🤖 Recommendation Approaches
-
-| Method | Technique | Strength |
-|---|---|---|
-| **Content-Based** | TF-IDF on genres + cosine similarity | Works for new users |
-| **Collaborative** | SVD matrix factorization | Captures user taste |
-| **Hybrid** | Weighted blend (adjustable α) | Best of both worlds |
+Every recommendation includes an explanation of why it was suggested. Users can submit thumbs-up/down feedback which is persisted to the backend.
 
 ---
 
-## 🏗️ Project Structure
-filmlens-ai/
-├── backend/
-│   ├── main.py                      # FastAPI app entry point
-│   ├── recommender/
-│   │   └── engine.py                # ML inference engine
-│   ├── routers/
-│   │   ├── movies.py                # Movie endpoints
-│   │   ├── recommendations.py       # Recommendation endpoints
-│   │   └── ratings.py               # Rating & feedback endpoints
-│   ├── models/schemas.py            # Pydantic schemas
-│   └── database/database.py         # SQLAlchemy setup
-├── frontend/
-│   ├── app/
-│   │   ├── page.tsx                 # Home — hero + carousels
-│   │   ├── movies/                  # Browse + movie detail
-│   │   └── recommendations/         # Recommendation dashboard
-│   ├── components/
-│   │   ├── movies/                  # MovieCard, Carousel, SearchBar
-│   │   ├── recommendations/         # RecommendationCard with feedback
-│   │   └── ui/                      # Navbar, Footer, badges
-│   └── lib/api.ts                   # Typed API client
-├── notebooks/
-│   ├── 01_eda.ipynb                 # Exploratory data analysis
-│   ├── 02_content_based.ipynb       # TF-IDF + cosine similarity
-│   ├── 03_collaborative_filtering.ipynb  # SVD with cross-validation
-│   └── 04_hybrid_model.ipynb        # Alpha-blended hybrid
-└── data/                            # MovieLens dataset + charts
+## Architecture
 
----
-
-## 🔌 API Endpoints
-GET  /movies/                     Paginated movie list with genre filter
-GET  /movies/search?query=        Live title search
-GET  /movies/{id}                 Movie detail with average rating
-GET  /recommend/content?title=    Content-based recommendations
-GET  /recommend/user/{id}         Collaborative SVD recommendations
-GET  /recommend/hybrid/{id}       Hybrid recommendations with alpha param
-GET  /recommend/metrics           Model evaluation metrics
-POST /rate                        Submit a movie rating
-POST /feedback                    Thumbs up/down on a recommendation
-
----
-
-## ⚙️ Tech Stack
-
-**ML & Backend**
-- Python 3.11, FastAPI, Uvicorn
-- scikit-surprise (SVD matrix factorization)
-- scikit-learn (TF-IDF, cosine similarity)
-- pandas, numpy
-- SQLAlchemy + SQLite
-- Deployed on Railway
-
-**Frontend**
-- Next.js 15, TypeScript
-- Framer Motion (animations)
-- Lucide React (icons)
-- TMDB API (real movie posters)
-- Deployed on Vercel
-
----
-
-## 🏃 Running Locally
-
-**Backend**
-```bash
-pip install fastapi uvicorn pandas scikit-learn scikit-surprise sqlalchemy python-dotenv
-
-cp .env.example .env
-# Edit .env with your values
-
-python -m uvicorn backend.main:app --reload
-# API docs at http://localhost:8000/docs
+```
+Browser (Next.js)  -->  FastAPI (Railway)  -->  SQLite
+                              |
+                         ML Engine
+                        /     |     \
+                   TF-IDF    SVD   Hybrid
+                              |
+                         MovieLens CSV
 ```
 
-**Frontend**
+The ML engine loads on startup, reads directly from the MovieLens CSV files, trains SVD in-memory, and serves recommendations via REST endpoints. No external ML infrastructure required.
+
+---
+
+## ML Pipeline
+
+The notebooks in `notebooks/` document the full research process:
+
+**01 — Exploratory Data Analysis**
+- 9,742 movies, 100,836 ratings, 610 users
+- Matrix sparsity: 98.3% (motivates SVD over KNN)
+- Rating distribution: positive skew, mode at 4.0
+
+**02 — Content-Based Filtering**
+- TF-IDF vectorization on cleaned genre strings
+- Cosine similarity computed on-demand (avoids storing 9742x9742 matrix)
+- Handles Sci-Fi/Film-Noir normalization
+
+**03 — Collaborative Filtering**
+- SVD via scikit-surprise (n_factors=50, n_epochs=10)
+- 5-fold cross-validation
+- RMSE: 0.8727 vs baseline 1.4243 (38.7% improvement)
+- Precision@10: 74.5%, Recall@10: 50.9%
+
+**04 — Hybrid Model**
+- Score: alpha * content_score + (1 - alpha) * collaborative_score
+- Default alpha=0.5, adjustable per request
+- Exposed as a live slider in the frontend
+
+---
+
+## API Reference
+
+```
+GET    /                              Health check
+GET    /health                        ML engine status
+
+GET    /movies/                       List movies (paginated, genre filter)
+GET    /movies/search?query=          Search movies by title
+GET    /movies/{movie_id}             Movie detail with average rating
+
+GET    /recommend/content?title=      Content-based recommendations
+GET    /recommend/user/{user_id}      Collaborative SVD recommendations
+GET    /recommend/hybrid/{user_id}    Hybrid recommendations (alpha param)
+GET    /recommend/metrics             Model evaluation metrics
+
+POST   /rate                          Submit a rating (0.5-5.0)
+GET    /user/{user_id}/ratings        User rating history
+POST   /feedback                      Thumbs up/down on a recommendation
+```
+
+Full interactive documentation available at `/docs` (Swagger UI) and `/redoc`.
+
+---
+
+## Project Structure
+
+```
+filmlens-ai/
+|
++-- backend/
+|   +-- main.py                       FastAPI application, CORS, startup
+|   +-- recommender/
+|   |   +-- engine.py                 ML engine (TF-IDF, SVD, hybrid)
+|   |   +-- hybrid_config.json        Default alpha configuration
+|   +-- routers/
+|   |   +-- movies.py                 Movie listing and search endpoints
+|   |   +-- recommendations.py        Recommendation endpoints
+|   |   +-- ratings.py                Rating and feedback endpoints
+|   +-- models/
+|   |   +-- schemas.py                Pydantic request/response schemas
+|   +-- database/
+|       +-- database.py               SQLAlchemy engine and session
+|
++-- frontend/
+|   +-- app/
+|   |   +-- page.tsx                  Home page with hero and carousels
+|   |   +-- movies/
+|   |   |   +-- page.tsx              Movie browser with genre filters
+|   |   |   +-- [id]/page.tsx         Movie detail with similar movies
+|   |   +-- recommendations/
+|   |       +-- page.tsx              Recommendation dashboard
+|   +-- components/
+|   |   +-- movies/
+|   |   |   +-- MovieCard.tsx         Poster card with TMDB images
+|   |   |   +-- MovieCarousel.tsx     Horizontal scrollable row
+|   |   |   +-- SearchBar.tsx         Live search with dropdown
+|   |   +-- recommendations/
+|   |   |   +-- RecommendationCard.tsx  Match score, explanation, feedback
+|   |   +-- ui/
+|   |       +-- Navbar.tsx            Fixed navigation bar
+|   |       +-- Footer.tsx            Tech stack and links
+|   |       +-- GenreBadge.tsx        Color-coded genre tags
+|   |       +-- LoadingSpinner.tsx    Loading state component
+|   +-- lib/
+|   |   +-- api.ts                    Typed Axios API client
+|   |   +-- utils.ts                  Helper functions
+|   +-- types/
+|       +-- index.ts                  TypeScript interfaces
+|
++-- notebooks/
+|   +-- 01_eda.ipynb                  Exploratory data analysis
+|   +-- 02_content_based.ipynb        TF-IDF and cosine similarity
+|   +-- 03_collaborative_filtering.ipynb  SVD with cross-validation
+|   +-- 04_hybrid_model.ipynb         Alpha-blended hybrid model
+|
++-- data/
+|   +-- movies.csv                    MovieLens movie metadata
+|   +-- ratings.csv                   100K user ratings
+|   +-- links.csv                     TMDB and IMDB ID mappings
+|
++-- requirements.txt
++-- runtime.txt
++-- render.yaml
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- TMDB API key (free at [themoviedb.org](https://www.themoviedb.org/settings/api))
+
+### Backend
+
+```bash
+# Clone the repository
+git clone https://github.com/mubashirnaqvi212/filmlens-ai.git
+cd filmlens-ai
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env and set your values
+
+# Start the API server
+python -m uvicorn backend.main:app --reload
+
+# API available at http://localhost:8000
+# Interactive docs at http://localhost:8000/docs
+```
+
+### Frontend
+
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
 
-# Create frontend/.env.local and add:
-# NEXT_PUBLIC_API_URL=http://localhost:8000
-# NEXT_PUBLIC_TMDB_API_KEY=your_key
-# NEXT_PUBLIC_TMDB_IMAGE_BASE=https://image.tmdb.org/t/p/w500
+# Configure environment
+# Create frontend/.env.local with:
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key
+NEXT_PUBLIC_TMDB_IMAGE_BASE=https://image.tmdb.org/t/p/w500
 
+# Start development server
 npm run dev
-# App at http://localhost:3000
+
+# App available at http://localhost:3000
 ```
 
 ---
 
-## 💡 Key Design Decisions
+## Deployment
 
-**Why SVD over KNN?**
-Matrix sparsity was 98.3% — KNN breaks down at this density. SVD factorizes the sparse matrix into latent factors, achieving 38.7% RMSE improvement over the global mean baseline.
+| Service | Platform | Configuration |
+|---|---|---|
+| Backend API | Railway | `render.yaml`, Python 3.11, auto-deploy from main |
+| Frontend | Vercel | Root directory: `frontend`, auto-deploy from main |
 
-**Why hybrid recommendations?**
-Pure content-based filtering ignores user taste history. Pure collaborative filtering fails for new users (cold-start). The hybrid blends both with an adjustable α parameter — exposed as a live slider in the UI.
-
-**Why FastAPI over Django/Flask?**
-Automatic OpenAPI documentation, async support, and Pydantic validation out of the box. The `/docs` endpoint makes the API immediately explorable without any extra tooling.
+Environment variables required on each platform are documented in `.env.example` (backend) and the frontend README.
 
 ---
 
-## 👤 Author
+## Design Decisions
 
-Built by [Mubashir Naqvi](https://github.com/mubashirnaqvi212) as a portfolio project demonstrating end-to-end ML system design.
+**SVD over KNN for collaborative filtering**
+With 98.3% matrix sparsity, KNN-based approaches struggle to find meaningful neighbors. SVD decomposes the sparse user-item matrix into latent factors, achieving 38.7% RMSE improvement over the global mean baseline.
+
+**On-demand cosine similarity instead of precomputed matrix**
+The full 9,742 x 9,742 cosine similarity matrix requires ~724MB of RAM. On Railway's free tier (512MB), this causes OOM crashes. Computing similarity on-demand per request uses negligible memory with acceptable latency.
+
+**Hybrid alpha as a request parameter**
+Rather than hardcoding the content/collaborative blend ratio, alpha is exposed as a query parameter and a live UI slider. This lets users and developers explore the tradeoff interactively.
+
+**SQLite for persistence**
+For a portfolio project with low write volume (ratings, feedback), SQLite is sufficient and eliminates infrastructure complexity. The schema is compatible with PostgreSQL via SQLAlchemy if scaling is needed.
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+## Author
+
+[Mubashir Naqvi](https://github.com/mubashirnaqvi212)
