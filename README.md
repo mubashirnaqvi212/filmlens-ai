@@ -11,7 +11,15 @@ A full-stack movie recommendation system built with FastAPI and Next.js, using S
 **Live demo:** [filmlens-ai-blue.vercel.app](https://filmlens-ai-blue.vercel.app) — **API docs:** [filmlens-api-production.up.railway.app/docs](https://filmlens-api-production.up.railway.app/docs)
 
 ---
+## Website 
 
+<img width="1900" height="874" alt="Recording 2026-06-03 034426 (1)" src="https://github.com/user-attachments/assets/6eb199e0-d7dd-4900-89a2-b948166dfdb2" />
+<img width="1920" height="872" alt="2" src="https://github.com/user-attachments/assets/4f29d05c-6b71-4bb4-9a9c-cbaa185ac8f1" />
+<img width="1894" height="872" alt="3" src="https://github.com/user-attachments/assets/3107b9b7-400c-4ccf-a6f2-8d9050b25454" />
+
+
+
+---
 ## Table of Contents
 
 - [Overview](#overview)
@@ -255,4 +263,13 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 ## Author
 
-[Mubashir Naqvi](https://github.com/mubashirnaqvi212)
+<p align="left">
+  <img src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png" width="18"/>
+  <b> Mubashir Naqvi</b>
+</p>
+
+<p align="left">
+  <a href="https://github.com/mubashirnaqvi212">
+    <img src="https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+</p>
